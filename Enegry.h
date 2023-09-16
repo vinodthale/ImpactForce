@@ -1,8 +1,5 @@
 // Author: vinod thale  15 sep 2023 
-double de, dee, se; 
-event energy_budgetDCB (i=0;i++) //to calculate energy---notice the iteration--use i this is for Drop+Bubble okay
-{    
-  static FILE * fp = fopen("energy.txt", "w");
+double de, dee, se;
   double vd = 0, VD = 0;
 	double ke1 = 0, ke2 = 0;
 	double ke = 0;
@@ -11,14 +8,12 @@ event energy_budgetDCB (i=0;i++) //to calculate energy---notice the iteration--u
 	double kn = (12./((1 - cfdbv.bubblediameter * cfdbv.bubblediameter * cfdbv.bubblediameter)*pi));
 	double PreFactor = 2*pi; // 2*pi; for theta integration okay 
 	foreach (reduction(+:ke1) reduction(+:ke2) reduction(+:ke) reduction(+:area) reduction(+:vd) reduction(+:VD))
-	{
 		//kinetic energy of both gas and liquid
 		ke1 +=  PreFactor*0.5*rho1*dv()*f[]*sq(u.x[]) + PreFactor*0.5*rho2*dv()*(1 - f[])*sq(u.x[]); // KE-X direction 
 		ke2 +=  PreFactor*0.5*rho1*dv()*f[]*sq(u.y[]) + PreFactor*0.5*rho2*dv()*(1 - f[])*sq(u.y[]); // KE-Y direction 
 		//the sum of kinetic energies of liquid and gas on vertical and horizontal components 
-    //kinetic energy contrast(only liquid)
+                 //kinetic energy contrast(only liquid)
 		ke +=  PreFactor*0.5*rho1*(sq(u.x[]) + sq(u.y[]))*dv()*f[];
-		//gpe +=  PreFactor*((rho1*f[]) + (rho2*(1 - f[])))*dv()*(1.0/sq(cfdbv.Froude))*x ;
 		if (f[] > 1e-6 && f[] < 1. - 1e-6)
 		{
 			coord p;
@@ -56,12 +51,6 @@ event energy_budgetDCB (i=0;i++) //to calculate energy---notice the iteration--u
 	//calculate dissipation energy(both)
 	dee += VD*dt;
 	double DEE = kn*dee;
-	//double GPE = kn*gpe; 
-	;
 	double TENG = KE+SE+DEE ; //the total energy no gravity
-	//double TEYG = KE+SE+DEE+GPE; //the total energy yes gravity
-	;
-	fprintf (fp, "%d  %f  %.10f  %.10f  %.10f  %.10f  %.10f  %.10f  %.10f  %.10f  %.10f\r\n", i, t - cfdbv.timecontact, KE1, KE2, KE, KEE, SE, DE, DEE, TENG, area);
-	fflush (fp); 
-}
+
 
