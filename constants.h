@@ -1,11 +1,14 @@
 
 // Author: vinod thale  15 sep 2023 
+// Basic framework  is devopled by Hossain Chizari 
+// Later functionalities added by Vinod Ashok Thale 
+// this is code is in non dimensional form 
 #include "axi.h"                       // axisymmetric geometry
 #include "navier-stokes/centered.h"    // solve NS equations
 #define FILTERED                       // Smear density and viscosity jumps
-#include "two-phase.h"
+#include "two-phase.h"                 // Solve two -phase eqaution 
 #include "tension.h"                   // include surface tension between phases
-#include "tag.h"                       // helps track droplet properties
+#include "tag.h"                       // help to count small droplet we can count its geometric mass, volume , area ...... etc
 #include "curvature.h"
 
 
@@ -14,7 +17,7 @@
 #if DIM_NONDIM_EXP == 'd' || DIM_NONDIM_EXP == 'D'
 
 #define VELOCITY			4.00                    // Velocity of Water   m/s  Si unit  for         
-#define DROP_DIAMETER		2.050e-03               // Diameter of Water  drop  meter Si unit 
+#define DROP_DIAMETER		        2.050e-03               // Diameter of Water  drop  meter Si unit 
 #define RHO_L				998.0                   // Density of Water drop     25 degree kg/m^3  Si unit 
 #define RHO_G				1.21                    // Density of air at 25 degree degree kg/m^3  Si unit 
 #define MU_L				0.001                   // Dynamisc Viscosity of Water    at 25 degree Pa s in Si unit 
@@ -26,18 +29,18 @@
 #define MU_GL				0.0
 #define REYNOLDS			0.0
 #define WEBER				0.0
-#define FROUDE              0.0
+#define FROUDE                          0.0
 
 #elif DIM_NONDIM_EXP == 'n' || DIM_NONDIM_EXP == 'N'
 
 #define WEBER				100.0
 #define REYNOLDS			100.0
-#define FROUDE              70.0
+#define FROUDE                          70.0
 #define RHO_GL				(0.0012) // air-water at 25C: 0.001187503
 #define MU_GL				(0.0210) // air-water at 25C: 0.020898876
 //
 #define VELOCITY			0.0
-#define DROP_DIAMETER		0.0
+#define DROP_DIAMETER		        0.0
 #define RHO_L				0.0
 #define MU_L				0.0
 #define SIGMA				0.0
@@ -49,8 +52,8 @@
 
 #define WEBER				300.0
 #define REYNOLDS			1000.0
-#define FROUDE              70.0
-#define DROP_DIAMETER		2.0e-3
+#define FROUDE                          70.0
+#define DROP_DIAMETER		        2.0e-3
 #define SIGMA				17.6e-3
 #define RHO_L				816.0
 #define RHO_G				1.2041
@@ -65,17 +68,17 @@
 #endif
 
 #define INITAL_GRID_LEVEL		9
-#define MAX_GRID_LEVEL			11
+#define MAX_GRID_LEVEL			12
 #define DOMAIN_WIDTH			4.00
-#define POOL_DEPTH				0.00
+#define POOL_DEPTH		        0.00
 #define INITIAL_DISTANCE		0.04
-#define BUBBLE_DIAMETER		    0.80      
-#define DBDELTA       		    0.00      
-#define REFINE_GAP				0.02
-#define MAX_TIME				2.00
+#define BUBBLE_DIAMETER		        0.80      
+#define DBDELTA       		        0.00      
+#define REFINE_GAP		        0.02
+#define MAX_TIME			2.00
 #define SAVE_FILE_EVERY			0.01 
 
-#define REFINE_VAR				{f, u.x, u.y} 
+#define REFINE_VAR		        {f, u.x, u.y} 
 #define REFINE_VAR_TEXT			"f, u.x, u.y" 
 #define REFINE_VALUE_0			-6
 #define REFINE_VALUE_1			-3
@@ -86,7 +89,7 @@
 #define REMOVE_DROP_PERIOD		4
 #define REMOVE_BUBBLE_YESNO		'n'
 #define REMOVE_BUBBLE_SIZE		4.0 // equivalent diameter base on the maximum refinement
-#define REMOVE_BUBBLE_PERIOD	4
+#define REMOVE_BUBBLE_PERIOD	         4
 
 
 #define FILENAME_DATA			"data"
@@ -95,8 +98,8 @@
 #define FILENAME_ENDOFRUN		"endofrun"
 #define FILENAME_LASTFILE		"lastfile"
 
-#define R_VOFLIMIT				1.0e-9
-#define R_PI					3.1415926535897932384626433832795
+#define R_VOFLIMIT		         1.0e-9
+#define R_PI			         3.1415926535897932384626433832795
 
 int LEVELmin = INITAL_GRID_LEVEL, LEVELmax = MAX_GRID_LEVEL ;
 double maxruntime = HUGE;
