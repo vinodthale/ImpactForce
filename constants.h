@@ -1,14 +1,13 @@
 
-// Author: vinod thale  15 sep 2023 
-// Basic framework  is devopled by Hossain Chizari 
+// Author: Vinod Thale  15 sep 2023 
+// Basic framework  is developed by Hossain Chizari 
 // Later functionalities added by Vinod Ashok Thale 
-// this is code is in non dimensional form 
 #include "axi.h"                       // axisymmetric geometry
 #include "navier-stokes/centered.h"    // solve NS equations
 #define FILTERED                       // Smear density and viscosity jumps
 #include "two-phase.h"                 // Solve two -phase eqaution 
 #include "tension.h"                   // include surface tension between phases
-#include "tag.h"                       // help to count small droplet we can count its geometric mass, volume , area ...... etc
+#include "tag.h"                       // help to count small droplets we can count its geometric mass, volume, area ...... etc
 #include "curvature.h"
 
 
@@ -16,11 +15,11 @@
 
 #if DIM_NONDIM_EXP == 'd' || DIM_NONDIM_EXP == 'D'
 
-#define VELOCITY			4.00                    // Velocity of Water   m/s  Si unit  for         
+#define VELOCITY			5.00                    // Velocity of Water   m/s  Si unit  for         
 #define DROP_DIAMETER		        2.050e-03               // Diameter of Water  drop  meter Si unit 
 #define RHO_L				998.0                   // Density of Water drop     25 degree kg/m^3  Si unit 
-#define RHO_G				1.21                    // Density of air at 25 degree degree kg/m^3  Si unit 
-#define MU_L				0.001                   // Dynamisc Viscosity of Water    at 25 degree Pa s in Si unit 
+#define RHO_G				1.21                    // Density of air at 25 degree kg/m^3  Si unit 
+#define MU_L				0.001                   // Dynamic Viscosity of Water    at 25 degree Pa s in Si unit 
 #define MU_G				1.81e-5                 // Dynamic Viscosity of air at 25 degree
 #define SIGMA				0.073                   // Surface tension of Water  drop  at 25 degree   N/m  Si unit 
 #define GRAVITY				9.81  
@@ -83,13 +82,6 @@
 #define REFINE_VALUE_0			-6
 #define REFINE_VALUE_1			-3
 #define REFINE_VALUE_2			-3
-
-#define REMOVE_DROP_YESNO		'n'
-#define REMOVE_DROP_SIZE		4.0 // equivalent diameter base on the maximum refinement
-#define REMOVE_DROP_PERIOD		4
-#define REMOVE_BUBBLE_YESNO		'n'
-#define REMOVE_BUBBLE_SIZE		4.0 // equivalent diameter base on the maximum refinement
-#define REMOVE_BUBBLE_PERIOD	         4
 
 
 #define FILENAME_DATA			"data"
@@ -170,50 +162,16 @@ int numericalmainvalues(char **argv, int argc, struct CFDValues *bvalues)
 	{
 	case 0:
 	{
-		printf("R: %f --- W: %f --- H: %f\r\n", bvalues->Reynolds, bvalues->Weber, bvalues->pooldepth);
-		FILE *fp;
-		fp = fopen (FILENAME_PARAMETERS, "w");
+	    printf("R: %f --- W: %f --- H: %f\r\n", bvalues->Reynolds, bvalues->Weber, bvalues->pooldepth);
+	    FILE *fp;
+	    fp = fopen (FILENAME_PARAMETERS, "w");
 	    fprintf (fp, "Name of Liquid : Water drop  \r\n");
-	    fprintf (fp, "Experimental parameters  / Numerical simulation parameters in Basilisk unit\r\n");
-		fprintf (fp, "Diameter_Experimental: %.3e / Normalized diameter  of drop (D): %.3e\r\n", DROP_DIAMETER, bvalues->diameter);
-		fprintf (fp, "Velocity_Experimental: %.3e / Normalized Velocity  of liquid (V) : %.3e\r\n", velocity, bvalues->vel);
-		fprintf (fp, "Rho(L)_Experimental: %.3e /  Normalized density of liquid (rho1): %.3e\r\n", RHO_L, bvalues->rhoL); 
-		fprintf (fp, "Rho(G)_Experimental: %.3e / Normalized density  of Air (rho2) : %.3e\r\n", RHO_G, bvalues->rhoG);
-		fprintf (fp, "Mu(L)_Experimental: %.3e / Normalized viscosity of liquid (mu1): %.3e\r\n", mu_l, bvalues->muL);
-		fprintf (fp, "Mu(G)_Experimental: %.3e / Normalized viscosity of Air (mu2): %.3e\r\n", MU_G, bvalues->muG);
-		fprintf (fp, "Sigma(L-G)_Experimental: %.3e / Normalized surface tension (f.sigma): %.3e\r\n", SIGMA, bvalues->Sigma);
-		fprintf (fp, "Acceleration due to gravity: %.3e / Normalized gravity (G.x): %.3e\r\n", GRAVITY, bvalues->GXnormlised);
-		fprintf (fp, "\r\n");
-		fprintf (fp, "Reynolds: %.10f\r\n", bvalues->Reynolds);
-		fprintf (fp, "Weber: %.10f\r\n", bvalues->Weber);
-		fprintf (fp, "Froude: %.10f\r\n", bvalues->Froude);
-		fprintf (fp, "Bond: %.10f\r\n", bvalues->Bond);
-		fprintf (fp, "Ohsorge: %.10f\r\n", bvalues->Oh);
-		fprintf (fp, "\r\n");
-		fprintf (fp, "Level Max: %d\r\n", LEVELmax);
-		fprintf (fp, "Level Min: %d\r\n", LEVELmin);
-		fprintf (fp, "Domain Size: %.2f\r\n", bvalues->domainsize);
-		fprintf (fp, "Pool Depth: %.2f\r\n", bvalues->pooldepth);
-		fprintf (fp, "Initial Distance: %.2f\r\n", bvalues->initialdis);
-		fprintf (fp, "Refine Gap: %.2f\r\n", bvalues->refinegap);
-		fprintf (fp, "Contact Time: %.2f\r\n", bvalues->timecontact);
-		fprintf (fp, "Domain Size: %.2f\r\n", bvalues->domainsize);
-		fprintf (fp, "\r\n");
-		fprintf (fp, "Bubble Diameter: %.2f\r\n", bvalues->bubblediameter);     
-		fprintf (fp, "Dbdelta (disatance btw drop and bubble) : %.6f\r\n", bvalues->dbdelta); 
-		fprintf (fp, "\r\n");  
-		fprintf (fp, "Refine Variables: %s\r\n", REFINE_VAR_TEXT);
-		fprintf (fp, "Refine Variables powers: %d, %d, %d\r\n", REFINE_VALUE_0, REFINE_VALUE_1, REFINE_VALUE_2);
-		fprintf (fp, "\r\n");
-		fprintf (fp, "Remove Drop YesNo: %c\r\n", REMOVE_DROP_YESNO);
-		fprintf (fp, "Remove Drop Size: %f\r\n", REMOVE_DROP_SIZE);
-		fprintf (fp, "Remove Drop Period: %d\r\n", REMOVE_DROP_PERIOD);
-		fprintf (fp, "\r\n");
-		fprintf (fp, "Remove Bubble YesNo: %c\r\n", REMOVE_BUBBLE_YESNO);
-		fprintf (fp, "Remove Bubble Size: %f\r\n", REMOVE_BUBBLE_SIZE);
-		fprintf (fp, "Remove Bubble Period: %d\r\n", REMOVE_BUBBLE_PERIOD);
-		fclose (fp);
-		break;
+	    fprintf (fp, "Experimental parameters  / Numerical simulation \r\n");
+	    fprintf (fp, "Diameter_Experimental: %.3e / Normalized diameter  of drop (D): %.3e\r\n", DROP_DIAMETER, bvalues->diameter);
+	    fprintf (fp, "Velocity_Experimental: %.3e / Normalized Velocity  of liquid (V) : %.3e\r\n", velocity, bvalues->vel);
+	    fprintf (fp, "Rho(L)_Experimental: %.3e /  Normalized density of liquid (rho1): %.3e\r\n", RHO_L, bvalues->rhoL); 
+	    fclose (fp);
+	    break;
 	}
 	}
 	return 1;
