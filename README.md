@@ -6,4 +6,4 @@ Installation
 The code relies on Basilisk to model the Navier-Stokes equations. See the installation page for instructions. http://basilisk.dalembert.upmc.fr/ 
 
 Running the code
-Its recommend using batch script. 
+Use the script ClusterMPI.sh 
