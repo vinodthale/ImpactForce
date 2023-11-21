@@ -1,7 +1,7 @@
 
 // Author: Vinod Thale  15 sep 2023 
 // Basic framework  is developed by Hossain Chizari 
-// Later functionalities added by Vinod Ashok Thale 
+// Later functionalities added by Vinod Ashok Thale and Professor Marie-Jean THORAVAL 
 #include "axi.h"                       // axisymmetric geometry
 #include "navier-stokes/centered.h"    // solve NS equations
 #define FILTERED                       // Smear density and viscosity jumps
