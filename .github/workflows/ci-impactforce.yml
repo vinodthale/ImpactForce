@@ -6,14 +6,12 @@ on:
     paths:
       - '**/*.c'
       - '**/*.h'
-      - 'src/**'
       - '.github/workflows/ci-impactforce.yml'
   pull_request:
     branches: [ main ]
     paths:
       - '**/*.c'
       - '**/*.h'
-      - 'src/**'
       - '.github/workflows/ci-impactforce.yml'
 
 jobs:
@@ -39,19 +37,19 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/basilisk
-        key: ${{ runner.os }}-basilisk-local-${{ hashFiles('src/**/*') }}
+        key: ${{ runner.os }}-basilisk-2024-01
         restore-keys: |
-          ${{ runner.os }}-basilisk-local-
+          ${{ runner.os }}-basilisk-
 
-    - name: Build Basilisk C from local source
+    - name: Download and build Basilisk
       if: steps.cache-basilisk.outputs.cache-hit != 'true'
       run: |
-        echo "Copying Basilisk source from repo..."
+        echo "Downloading Basilisk from basilisk.fr..."
+        curl -L http://basilisk.fr/basilisk.tar.gz -o basilisk.tar.gz
         mkdir -p $HOME/basilisk
-        cp -r src/* $HOME/basilisk/
+        tar -xzf basilisk.tar.gz -C $HOME/basilisk --strip-components=1
 
-        cd $HOME/basilisk
-        cd src
+        cd $HOME/basilisk/src
         ln -sf config.gcc config
 
         echo "Building Basilisk..."
